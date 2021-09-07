@@ -1,0 +1,22 @@
+{
+    "name": "thecoder/thecoderpsshipping",
+    "description": "Prestashop Module for shipping ",
+    "authors": [
+        {
+            "name": "Yenux TheCoder",
+            "email": "bouyesamuel@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Thecoderpsshipping\\": "src/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "prepend-autoloader": false
+    },
+    "type": "prestashop-module",
+    "author": "thecoder",
+    "license": "MIT"
+}
