@@ -23,14 +23,15 @@ class ThecoderpsshippingCommune
     /**
      * @var string
      *
-     * @ORM\Column(name="commune_name", type="string", length=64)
+     * @ORM\Column(name="commune
+     * _name", type="string", length=64)
      */
     private $communeName;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="active", type="tinyint")
+     * @ORM\Column(name="active", type="boolean")
      */
     private $active;
 

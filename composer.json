@@ -10,13 +10,10 @@
     "autoload": {
         "psr-4": {
             "Thecoderpsshipping\\": "src/"
-        }
-    },
-    "config": {
-        "preferred-install": "dist",
-        "prepend-autoloader": false
-    },
-    "type": "prestashop-module",
-    "author": "thecoder",
-    "license": "MIT"
+        },
+        "config": {
+            "prepend-autoloader": false
+        },
+        "type": "prestashop-module"
+    }
 }

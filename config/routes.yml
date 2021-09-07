@@ -1,0 +1,6 @@
+# modules/thecoderpsshipping/config/routes.yml
+thecoder_demo:
+    path: thecoder/demo
+    methods: [GET]
+    defaults:
+      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::demoAction'

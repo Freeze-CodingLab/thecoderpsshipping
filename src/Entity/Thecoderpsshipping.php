@@ -37,7 +37,7 @@ class Thecoderpsshipping
     /**
      * @var int
      *
-     * @ORM\Column(name="active", type="tinyint")
+     * @ORM\Column(name="active", type="boolean")
      */
     private $active;
 
