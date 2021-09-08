@@ -23,8 +23,7 @@ class ThecoderpsshippingCommune
     /**
      * @var string
      *
-     * @ORM\Column(name="commune
-     * _name", type="string", length=64)
+     * @ORM\Column(name="commune_name", type="string", length=64)
      */
     private $communeName;
 

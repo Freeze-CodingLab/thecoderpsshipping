@@ -1,31 +1,52 @@
 # modules/thecoderpsshipping/config/routes.yml
-thecoder_demo:
-    path: thecoder/demo
-    methods: [GET]
-    defaults:
-      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::demoAction'
-
-# modules/thecoderpsshipping/config/routes.yml
-thecoder_add:
+thecoder_add_city:
     path: thecoder/add_city
     methods: [GET, POST]
     defaults:
       _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::addAction'
 
-thecoder_list:
-    path: thecoder/list
+thecoder_city_list:
+    path: thecoder/list_city
     methods: [GET, POST]
     defaults:
-      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::list'
+      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::listCity'
 
 thecoder_edit_city:
-    path: thecoder/edit_city
+    path: thecoder/edit_city/{id}
     methods: [GET, POST]
     defaults:
-      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::list'
+      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::updateAction'
 
 thecoder_delete_city:
-    path: thecoder/edit_city
+    path: thecoder/delete_city/{id}
     methods: [GET, POST]
     defaults:
-      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::list'
+      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::deleteAction'
+
+
+
+thecoder_add_commune:
+    path: thecoder/add_commune
+    methods: [GET, POST]
+    defaults:
+      _controller: 'Thecoderpsshipping\Controller\CommuneController::addAction'
+
+
+thecoder_commune_list:
+    path: thecoder/list_commune
+    methods: [GET, POST]
+    defaults:
+      _controller: 'Thecoderpsshipping\Controller\CommuneController::listCommune'
+
+thecoder_edit_commune:
+    path: thecoder/edit_commune/{id}
+    methods: [GET, POST]
+    defaults:
+      _controller: 'Thecoderpsshipping\Controller\CommuneController::updateAction'
+
+thecoder_delete_commune:
+    path: thecoder/delete_commune/{id}
+    methods: [GET, POST]
+    defaults:
+      _controller: 'Thecoderpsshipping\Controller\CommuneController::deleteAction'
+

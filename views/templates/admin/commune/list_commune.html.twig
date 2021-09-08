@@ -1,0 +1,56 @@
+{#**
+ * 2007-2020 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License 3.0 (AFL-3.0).
+ * It is also available through the world-wide-web at this URL: https://opensource.org/licenses/AFL-3.0
+ *#}
+
+{% extends "PrestaShopBundle:Admin:layout.html.twig" %}
+
+{% block content %}
+	<h1>List Commune
+		<h1/>
+
+		{% for message in app.flashes('notice') %}
+			<div class="alert alert-success">
+				{{ message }}
+			</div>
+		{% endfor %}
+
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">
+					<a href="{{ path('thecoder_add_commune') }}">Add new commune</a>
+				</li>
+			</ol>
+		</nav>
+
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Commune Name</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for commune in communes %}
+					<tr>
+						<th scope="row">{{ commune.id }}</th>
+						<td>{{ commune.communeName }}</td>
+						<td>{{ commune.active == 1 ? 'actif' : 'non-actif' }}</td>
+						<td>
+							<a href="{{ path('thecoder_edit_commune', {'id': commune.id}) }}" class="btn btn-primary">Edit</td>
+						</td>
+						<td>
+							<a href="{{ path('thecoder_delete_commune', {'id': commune.id}) }}" class="btn btn-danger">Delete</td>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+	{% endblock %}

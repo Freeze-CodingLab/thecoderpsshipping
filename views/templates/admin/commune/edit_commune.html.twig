@@ -1,0 +1,24 @@
+{#**
+ * 2007-2020 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License 3.0 (AFL-3.0).
+ * It is also available through the world-wide-web at this URL: https://opensource.org/licenses/AFL-3.0
+ *#}
+
+{% extends "PrestaShopBundle:Admin:layout.html.twig" %}
+
+{% block content %}
+
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item">
+				<a href="{{ path('thecoder_commune_list') }}">Back to List</a>
+			</li>
+		</ol>
+	</nav>
+
+	{{ form_start(form) }}
+	{{ form_end(form) }}
+{% endblock %}

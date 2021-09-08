@@ -10,13 +10,32 @@
 {% extends "PrestaShopBundle:Admin:layout.html.twig" %}
 
 {% block content %}
-	<h1>List
+
+	<h1>List City
 		<h1/>
+
+		<br>
+		{% for message in app.flashes('notice') %}
+			<div class="alert alert-success">
+				{{ message }}
+			</div>
+		{% endfor %}
+
+
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item">
+					<a href="{{ path('thecoder_add_city') }}">Create new city</a>
+				</li>
+			</ol>
+		</nav>
+
 		<table class="table">
 			<thead>
 				<tr>
 					<th>#</th>
 					<th>City Name</th>
+					<th>Status</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -24,14 +43,16 @@
 					<tr>
 						<th scope="row">{{ city.id }}</th>
 						<td>{{ city.cityName }}</td>
+						<td>{{ city.active == 1 ? 'actif' : 'non-actif' }}</td>
 						<td>
-							<a href="{{ path('thecoder_edit_city') }}" class="btn btn-primary">Edit</td>
+							<a href="{{ path('thecoder_edit_city', {'id': city.id}) }}" class="btn btn-primary">Edit</td>
 						</td>
 						<td>
-							<a href="{{ path('thecoder_delete_city') }}" class="btn btn-danger">Delete</td>
+							<a href="{{ path('thecoder_delete_city', {'id': city.id}) }}" class="btn btn-danger">Delete</td>
 						</td>
 					</tr>
 				{% endfor %}
 			</tbody>
 		</table>
+
 	{% endblock %}
