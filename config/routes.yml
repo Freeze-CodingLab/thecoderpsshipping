@@ -4,3 +4,10 @@ thecoder_demo:
     methods: [GET]
     defaults:
       _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::demoAction'
+
+# modules/thecoderpsshipping/config/routes.yml
+thecoder_add:
+    path: thecoder/add
+    methods: [GET, POST]
+    defaults:
+      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::addAction'
