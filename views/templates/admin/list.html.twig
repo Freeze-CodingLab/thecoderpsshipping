@@ -1,0 +1,37 @@
+{#**
+ * 2007-2020 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License 3.0 (AFL-3.0).
+ * It is also available through the world-wide-web at this URL: https://opensource.org/licenses/AFL-3.0
+ *#}
+
+{% extends "PrestaShopBundle:Admin:layout.html.twig" %}
+
+{% block content %}
+	<h1>List
+		<h1/>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>City Name</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for city in citys %}
+					<tr>
+						<th scope="row">{{ city.id }}</th>
+						<td>{{ city.cityName }}</td>
+						<td>
+							<a href="{{ path('thecoder_edit_city') }}" class="btn btn-primary">Edit</td>
+						</td>
+						<td>
+							<a href="{{ path('thecoder_delete_city') }}" class="btn btn-danger">Delete</td>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endblock %}

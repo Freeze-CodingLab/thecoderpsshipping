@@ -7,7 +7,25 @@ thecoder_demo:
 
 # modules/thecoderpsshipping/config/routes.yml
 thecoder_add:
-    path: thecoder/add
+    path: thecoder/add_city
     methods: [GET, POST]
     defaults:
       _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::addAction'
+
+thecoder_list:
+    path: thecoder/list
+    methods: [GET, POST]
+    defaults:
+      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::list'
+
+thecoder_edit_city:
+    path: thecoder/edit_city
+    methods: [GET, POST]
+    defaults:
+      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::list'
+
+thecoder_delete_city:
+    path: thecoder/edit_city
+    methods: [GET, POST]
+    defaults:
+      _controller: 'Thecoderpsshipping\Controller\ThecoderpsshippingController::list'

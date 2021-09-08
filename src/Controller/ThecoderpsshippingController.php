@@ -42,4 +42,20 @@ class ThecoderpsshippingController extends FrameworkBundleAdminController
             ]
         );
     }
+
+    public function list()
+    {
+
+        $citys = $this->getDoctrine()
+            ->getRepository(Thecoderpsshipping::class)
+            ->findAll();
+
+
+        return $this->render(
+            '@Modules/thecoderpsshipping/views/templates/admin/list.html.twig',
+            [
+                'citys' => $citys
+            ]
+        );
+    }
 }
