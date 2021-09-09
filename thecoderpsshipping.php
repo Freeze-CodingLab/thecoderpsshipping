@@ -16,6 +16,8 @@ if (!defined('_PS_VERSION_')) {
 class Thecoderpsshipping extends CarrierModule
 {
 
+
+
     public function __construct()
     {
         $this->name = 'thecoderpsshipping';
@@ -42,6 +44,9 @@ class Thecoderpsshipping extends CarrierModule
     {
 
 
+        Configuration::updateValue('THECODER1_ZONE_ID', $this->_installZone('Abidjan livraison'));
+        Configuration::updateValue('THECODER2_ZONE_ID', $this->_installZone('Interrieur livraison'));
+
         $carrierConfig = array(
             0 => array(
                 'name' => $this->l('Cerise Express Carrier'),
@@ -51,7 +56,7 @@ class Thecoderpsshipping extends CarrierModule
                 'shipping_external' => true,
                 'external_module_name' => $this->name,
                 'shipping_method' => 2,
-                'delay' => $this->l('24 houres')
+                'delay' => $this->l('24 houres'),
             ),
             1 => array(
                 'name' => $this->l('Cerise Standart Carrier'),
@@ -61,14 +66,26 @@ class Thecoderpsshipping extends CarrierModule
                 'shipping_external' => true,
                 'external_module_name' => $this->name,
                 'shipping_method' => 2,
-                'delay' => $this->l('48 houres')
+                'delay' => $this->l('48 houres'),
+            ),
+            2 => array(
+                'name' => $this->l('Cerise Enterrieur Carrier'),
+                'active' => true,
+                'range_behavior' => 1,
+                'need_range' => 1,
+                'shipping_external' => true,
+                'external_module_name' => $this->name,
+                'shipping_method' => 2,
+                'delay' => $this->l('48 houres'),
             )
         );
 
         $id_carrier1 = $this->addCarrier($carrierConfig[0]);
         $id_carrier2 = $this->addCarrier($carrierConfig[1]);
+        $id_carrier3 = $this->addCarrier($carrierConfig[2]);
         Configuration::updateValue('THECODER1_ID', $id_carrier1);
         Configuration::updateValue('THECODER2_ID', $id_carrier2);
+        Configuration::updateValue('THECODER2_ID', $id_carrier3);
 
 
         return parent::install()
@@ -91,10 +108,21 @@ class Thecoderpsshipping extends CarrierModule
             (int)Configuration::get('THECODER2_ID')
         );
 
+        $carrier3 = new Carrier(
+            (int)Configuration::get('THECODER2_ID')
+        );
+
+        $zone1 = new Zone(Configuration::get('THECODER1_ZONE_ID'));
+        $zone2 = new Zone(Configuration::get('THECODER2_ZONE_ID'));
+
         Configuration::deleteByName('THECODER1_ID');
         Configuration::deleteByName('THECODER2_ID');
+        Configuration::deleteByName('THECODER3_ID');
         $carrier1->delete();
         $carrier2->delete();
+        $carrier3->delete();
+        $zone1->delete();
+        $zone2->delete();
 
         return parent::uninstall() && $this->uninstallSql();
     }
@@ -216,14 +244,31 @@ class Thecoderpsshipping extends CarrierModule
             $range_price->add();
 
             //Add carrier zone
-            $id_zone_afrique = Zone::getIdByName('Africa');
-
-            $carrier->addZone($id_zone_afrique ? $id_zone_afrique : 1);
+            $id_zone_africa = Zone::getIdByName('Africa');
+            $carrier->addZone($id_zone_africa ? $id_zone_africa : 1);
 
             return $carrier->id;
         }
         return false;
     }
+
+
+    /**
+     * Création de la zone clic and collect
+     * @return bool
+     */
+    protected function _installZone($zone_name)
+    {
+        try {
+            $zone = new Zone();
+            $zone->name = $this->l($zone_name);
+            $zone->save();
+            return $zone->id;
+        } catch (PrestaShopException $e) {
+            return false;
+        }
+    }
+
 
 
     public function hookUpdateCarrier($params)
@@ -240,28 +285,36 @@ class Thecoderpsshipping extends CarrierModule
         if ($id_carrier_old === (int) Configuration::get('THECODER2_ID')) {
             Configuration::updateValue('THECODER2_ID', $id_carrier_new);
         }
-    }
 
-    public function hookDisplayCarrierExtraContent($params)
-    {
-        if ($params['carrier']['id'] == Configuration::get('THECODER1_ID')) {
-            return $this->display(__FILE__, 'extra_carrier1.tpl');
-        } else {
-            return $this->display(__FILE__, 'extra_carrier2.tpl');
+        //for carrier 3
+        if ($id_carrier_old === (int) Configuration::get('THECODER3_ID')) {
+            Configuration::updateValue('THECODER3_ID', $id_carrier_new);
         }
     }
+
+    // public function hookDisplayCarrierExtraContent($params)
+    // {
+    //     if ($params['carrier']['id'] == Configuration::get('THECODER1_ID')) {
+    //         return $this->display(__FILE__, 'extra_carrier1.tpl');
+    //     } else {
+    //         return $this->display(__FILE__, 'extra_carrier2.tpl');
+    //     }
+    // }
 
     public function hookActionGetIDZoneByAddressID($params)
     {
         $address = new Address($params['id_address']);
 
+        //a call to  database for get all city of ivory coast
         //make a configuration for get this id by user
-        $id_zone = 9;
+        $id_zone1 = Configuration::get('THECODER1_ZONE_ID');
+        $id_zone2 = Configuration::get('THECODER2_ZONE_ID');
 
-        // dump($address->city);
-        // die();
-        if ($address->city == 'abidjan') {
-            return $id_zone; //L'important est de retourner la zone ici
+
+        if ($address->city == 'abidjan' && Country::getIdByName(1, $address->country) == 32) {
+            return $id_zone1; //L'important est de retourner la zone ici
+        } elseif ($address->city != 'abidjan' && Country::getIdByName(1, $address->country) == 32) {
+            return $id_zone2; //L'important est de retourner la zone ici
         }
     }
 }
