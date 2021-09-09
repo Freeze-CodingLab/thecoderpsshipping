@@ -8,6 +8,8 @@
  * @link https://www.team-ever.com
  */
 
+use GraphQL\Utils\Value;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -94,6 +96,16 @@ class Thecoderpsshipping extends CarrierModule
             && $this->registerHook('displayOrderConfirmation')
             && $this->registerHook('actionGetIDZoneByAddressID')
             && $this->registerHook('displayPDFInvoice')
+            && $this->registerHook('additionalCustomerAddressFields')
+            && $this->registerHook('actionAfterCreateAddressFormHandler')
+            && $this->registerHook('actionValidateCustomerAddressForm')
+            && $this->registerHook('actionObjectAddressAddBefore')
+            && $this->registerHook('actionObjectAddressAddAfter')
+            && $this->registerHook('actionObjectAddressUpdateAfter')
+            && $this->registerHook('actionObjectAddressUpdateBefore')
+            && $this->registerHook('actionObjectAddressDeleteAfter')
+            && $this->registerHook('displayAdminOrder')
+            && $this->registerHook('actionFrontControllerSetMedia')
             && $this->registerHook('updateCarrier');
     }
 
@@ -173,10 +185,23 @@ class Thecoderpsshipping extends CarrierModule
             ';
 
 
+
+        $sqlCart = '
+        CREATE TABLE IF NOT EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_cart`(
+            `id_cart` INT(11) NOT NULL,
+            `thecoderpsshipping_city_shipping` INT(11) NOT NULL,
+            `price` decimal(20,6) NOT NULL DEFAULT "0.000000",
+            PRIMARY KEY(
+                `id_cart`
+            )
+        ) ENGINE = ' . pSQL(_MYSQL_ENGINE_) . ' DEFAULT CHARSET = utf8;
+            ';
+
         return (Db::getInstance()->execute($sqlCity)
             && Db::getInstance()->execute($sqlCommune)
             && Db::getInstance()->execute($sqlCA)
             && Db::getInstance()->execute($sqlCityShipping));
+            && Db::getInstance()->execute($sqlCart));
     }
 
 
@@ -187,11 +212,13 @@ class Thecoderpsshipping extends CarrierModule
         $sqlCommune = 'DROP TABLE IF EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_commune`';
         $sqlCA = 'DROP TABLE IF EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_customer_address`';
         $sqlCityShipping = 'DROP TABLE IF EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_city_shipping`';
+        $sqlCart = 'DROP TABLE IF EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_cart`';
 
         return (Db::getInstance()->execute($sqlCity)
             && Db::getInstance()->execute($sqlCommune)
             && Db::getInstance()->execute($sqlCA)
             && Db::getInstance()->execute($sqlCityShipping));
+            && Db::getInstance()->execute($sqlCart));
     }
 
 
@@ -315,6 +342,118 @@ class Thecoderpsshipping extends CarrierModule
             return $id_zone1; //L'important est de retourner la zone ici
         } elseif ($address->city != 'abidjan' && Country::getIdByName(1, $address->country) == 32) {
             return $id_zone2; //L'important est de retourner la zone ici
+        }
+    }
+
+    //additionnal customer formfields
+    public function hookAdditionalCustomerAddressFields($params)
+    {
+        //Get city from database
+        $cities = \Db::getInstance()->executeS('
+            SELECT * FROM `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping` WHERE `active` = 1
+        ');
+
+        $cityKey = array();
+        $cityValue = array();
+
+        //get all city for displaying
+        foreach ($cities as $key => $value) {
+            $cityKey[] = $value['id_thecoderpsshipping'];
+            $cityValue[] = $value['city_name'];
+        }
+
+
+        //Combine city list information on one array
+        $cityList = array_combine($cityKey, $cityValue);
+
+
+
+        $formField = (new FormField)
+            ->setName('id_thecoderpsshipping')
+            ->setType('select')
+            ->setAvailableValues($cityList)
+            ->setLabel($this->getTranslator()->trans('City', [], 'Modules.Thecoderpsshipping.Front'));
+
+
+
+        //if a city already choosed selected by default when user want update
+        if (Tools::getIsset('id_address')) {
+            $address = new Address(Tools::getValue('id_address'));
+
+            if (!empty($cities)) {
+                foreach ($cities as $city) {
+                    $formField->addAvailableValue(
+                        $city['id_thecoderpsshipping'],
+                        $city['city_name']
+                    );
+                }
+                if (!empty($address->id)) {
+                    $id_thecoderpsshipping =  \Db::getInstance()->executeS('SELECT `id_thecoderpsshipping` FROM `' . _DB_PREFIX_ . 'thecoderpsshipping_customer_address` WHERE `id_address` = ' . $address->id);
+
+                    if ($formField->getValue() == null) {
+
+                        $formField->setValue($id_thecoderpsshipping[0]['id_thecoderpsshipping']);
+                    } else {
+                        dump('l');
+                        die();
+                    }
+                    // $formField->setValue($id_thecoderpsshipping[0]['id_thecoderpsshipping']);
+
+                }
+            }
+        }
+        return array(
+            $formField
+        );
+    }
+
+
+    public function hookActionObjectAddressAddAfter($params)
+    {
+
+        if ($params['object']->id_thecoderpsshipping != null) {
+            $db = \Db::getInstance();
+            $result = $db->insert('thecoderpsshipping_customer_address', [
+                'id_address' => (int) $params['object']->id,
+                'id_thecoderpsshipping' => (int)$params['object']->id_thecoderpsshipping,
+            ]);
+
+            return $result;
+        }
+    }
+
+    public function hookActionObjectAddressUpdateBefore($params)
+    {
+        if ($params['object']->id_thecoderpsshipping != null) {
+            $db = \Db::getInstance();
+            $result = $db->insert('thecoderpsshipping_customer_address', [
+                'id_address' => (int) $params['object']->id,
+                'id_thecoderpsshipping' => (int)$params['object']->id_thecoderpsshipping,
+            ]);
+
+            return $result;
+        }
+    }
+
+    public function hookActionObjectAddressUpdateAfter($params)
+    {
+        if ($params['object']->id_thecoderpsshipping != null) {
+            $db = \Db::getInstance();
+            $result = $db->update('thecoderpsshipping_customer_address', [
+                'id_thecoderpsshipping' => (int)$params['object']->id_thecoderpsshipping,
+            ], 'id_address =' . (int) $params['object']->id, 1);
+
+            return $result;
+        }
+    }
+
+    public function hookActionObjectAddressDeleteAfter($params)
+    {
+        if ($params['object']->id_thecoderpsshipping != null) {
+            $db = \Db::getInstance();
+            $result = $db->delete('thecoderpsshipping_customer_address', 'id_address =' . (int) $params['object']->id);
+
+            return $result;
         }
     }
 }
