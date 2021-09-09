@@ -50,3 +50,17 @@ thecoder_delete_commune:
     defaults:
       _controller: 'Thecoderpsshipping\Controller\CommuneController::deleteAction'
 
+
+
+
+thecoder_add_shipping:
+    path: thecoder/add_shipping
+    methods: [GET, POST]
+    defaults:
+      _controller: 'Thecoderpsshipping\Controller\CityShippingController::addAction'
+
+thecoder_shipping_list:
+    path: thecoder/list_shipping
+    methods: [GET, POST]
+    defaults:
+      _controller: 'Thecoderpsshipping\Controller\CityShippingController::listShipping'

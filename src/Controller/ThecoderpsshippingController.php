@@ -32,8 +32,6 @@ class ThecoderpsshippingController extends FrameworkBundleAdminController
                 'notice',
                 'commune added!'
             );
-
-            $this->redirectToRoute('thecoder_list_city', array(), 301);
         }
 
         return $this->render(
@@ -45,7 +43,7 @@ class ThecoderpsshippingController extends FrameworkBundleAdminController
         );
     }
 
-    public function list()
+    public function listCity()
     {
 
         $citys = $this->getDoctrine()
@@ -54,7 +52,7 @@ class ThecoderpsshippingController extends FrameworkBundleAdminController
 
 
         return $this->render(
-            '@Modules/thecoderpsshipping/views/templates/admin/city/list.html.twig',
+            '@Modules/thecoderpsshipping/views/templates/admin/city/list_city.html.twig',
             [
                 'citys' => $citys
             ]
@@ -123,6 +121,6 @@ class ThecoderpsshippingController extends FrameworkBundleAdminController
             'notice',
             'City updated!'
         );
-        return $this->redirectToRoute('thecoder_list_city', array(), 301);
+        return $this->redirectToRoute('thecoder_city_list', array(), 301);
     }
 }
