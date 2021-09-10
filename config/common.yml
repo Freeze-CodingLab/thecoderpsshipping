@@ -1,0 +1,6 @@
+services:
+  thecoder.thecoderpsshipping.repository.thecoderpsshipping_repository:
+    class: Thecoderpsshipping\Repository\ThecoderpsshippingRepository
+    factory: ['@doctrine.orm.default_entity_manager', getRepository]
+    arguments:
+      - Thecoderpsshipping\Entity\Thecoderpsshipping

@@ -6,6 +6,8 @@
 * @link https://www.team-ever.com
 *}
 <div class="alert alert-info" id="depots-list">
-    <h1>Standart Carrier</h1>
-    <p>If your a in Abidjan carrier is 2000fr</p>
+    {* {var_dump($cities)} *}
+    {foreach from=$cities item=city}
+        <li>{$city->getCityName()|escape:'htmlall':'UTF-8'}</li>
+    {/foreach}
 </div>
