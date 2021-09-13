@@ -7,25 +7,18 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table()
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Thecoderpsshipping\Repository\ThecoderpsshippingCityShippingRepository")
  */
 class ThecoderpsshippingCityShipping
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(name="id_thecoderpsshipping_city_shipping", type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="id_thecoderpsshipping", type="integer")
+     * @var Thecoderpsshipping
+     * @ORM\Id
+     * @ORM\OneToOne(targetEntity="Thecoderpsshipping\Entity\Thecoderpsshipping")
+     * @ORM\JoinColumn(name="id_thecoderpsshipping", referencedColumnName="id_thecoderpsshipping", nullable=false)
      */
-    private $thecoderpsshippingId;
+    private $thecoderpsshipping;
 
 
     /**
@@ -36,36 +29,37 @@ class ThecoderpsshippingCityShipping
     private $price;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="delivery_time", type="string")
+     */
+    private $deliveryTime;
+
+    /**
      * @var int
      *
      * @ORM\Column(name="active", type="boolean")
      */
     private $active;
 
+
+
     /**
-     * @return int
+     * @return Thecoderpsshipping
      */
-    public function getId()
+    public function getThecoderpsshipping()
     {
-        return $this->id;
+        return $this->thecoderpsshipping;
     }
 
     /**
-     * @return int
-     */
-    public function getthecoderpsshippingId()
-    {
-        return $this->thecoderpsshippingId;
-    }
-
-    /**
-     * @param int $thecoderpsshippingId
+     * @param Thecoderpsshipping $thecoderpsshipping
      *
-     * @return CityShipping
+     * @return $this
      */
-    public function setThecoderpsshippingId($thecoderpsshippingId)
+    public function setThecoderpsshipping(Thecoderpsshipping $thecoderpsshipping)
     {
-        $this->thecoderpsshippingId = $thecoderpsshippingId;
+        $this->thecoderpsshipping = $thecoderpsshipping;
 
         return $this;
     }
@@ -82,7 +76,7 @@ class ThecoderpsshippingCityShipping
     /**
      * @param price $price
      *
-     * @return CityShipping
+     * @return $this
      */
     public function setPrice($price)
     {
@@ -92,7 +86,27 @@ class ThecoderpsshippingCityShipping
     }
 
     /**
-     * @return int
+     * @return string
+     */
+    public function getDeliveryTime()
+    {
+        return $this->deliveryTime;
+    }
+
+    /**
+     * @param deliveryTime $deliveryTime
+     *
+     * @return $this
+     */
+    public function setDeliveryTime($deliveryTime)
+    {
+        $this->deliveryTime = $deliveryTime;
+
+        return $this;
+    }
+
+    /**
+     * @return active
      */
     public function getActive()
     {
@@ -100,27 +114,14 @@ class ThecoderpsshippingCityShipping
     }
 
     /**
-     * @param int $active
+     * @param active $active
      *
-     * @return Thecoderpsshipping
+     * @return $this
      */
     public function setActive($active)
     {
         $this->active = $active;
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        return [
-            'id_thecoderpsshipping_city_shipping' => $this->getId(),
-            'id_thecoderpsshipping' => $this->getThecoderpsshippingId(),
-            'price' => $this->getPrice(),
-            'active' => $this->getActive(),
-        ];
     }
 }

@@ -139,12 +139,12 @@ class Thecoderpsshipping extends CarrierModule
 
         $sqlCityShipping = '
         CREATE TABLE IF NOT EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_city_shipping`(
-            `id_thecoderpsshipping_city_shipping` INT AUTO_INCREMENT NOT NULL,
             `id_thecoderpsshipping` INT DEFAULT NULL,
             `price` decimal(20,6) NOT NULL DEFAULT "0.000000",
+            `delivery_time` VARCHAR(255) NOT NULL,
             `active` TINYINT(1) NOT NULL,
             PRIMARY KEY(
-                `id_thecoderpsshipping_city_shipping`, `id_thecoderpsshipping`
+                `id_thecoderpsshipping`
             )
         ) ENGINE = ' . pSQL(_MYSQL_ENGINE_) . ' DEFAULT CHARSET = utf8;
             ';
@@ -261,8 +261,6 @@ class Thecoderpsshipping extends CarrierModule
         }
     }
 
-
-
     public function hookUpdateCarrier($params)
     {
         $id_carrier_old = (int) $params['id_carrier'];
@@ -277,32 +275,18 @@ class Thecoderpsshipping extends CarrierModule
     public function hookDisplayCarrierExtraContent($params)
     {
 
-        $repository = $this->get('thecoder.thecoderpsshipping.repository.thecoderpsshipping_repository');
+        // $repository = $this->get('thecoder.thecoderpsshipping.repository.thecoderpsshipping_repository');
+        $repository = $this->get('thecoder.thecoderpsshipping.repository.thecoderpsshipping_city_shipping_repository');
+        // die(dump($repository->getShippingPrice()));
 
 
-
+        // die(dump(get_class($repository)));
         // if ($params['carrier']['id'] == Configuration::get('THECODER_ID')) {
-        $this->smarty->assign(['cities' => $repository->findAll()]);
+        $this->smarty->assign(['cities' => $repository->getShippingPrice()]);
         return $this->display(__FILE__, 'extra_carrier.tpl');
         // }
     }
 
-    // public function hookActionGetIDZoneByAddressID($params)
-    // {
-    //     $address = new Address($params['id_address']);
-
-    //     //a call to  database for get all city of ivory coast
-    //     //make a configuration for get this id by user
-    //     $id_zone1 = Configuration::get('THECODER1_ZONE_ID');
-    //     $id_zone2 = Configuration::get('THECODER2_ZONE_ID');
-
-
-    //     if ($address->city == 'abidjan' && Country::getIdByName(1, $address->country) == 32) {
-    //         return $id_zone1; //L'important est de retourner la zone ici
-    //     } elseif ($address->city != 'abidjan' && Country::getIdByName(1, $address->country) == 32) {
-    //         return $id_zone2; //L'important est de retourner la zone ici
-    //     }
-    // }
 
     //additionnal customer formfields
     public function hookAdditionalCustomerAddressFields($params)

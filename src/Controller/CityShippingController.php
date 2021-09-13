@@ -20,14 +20,18 @@ class CityShippingController extends FrameworkBundleAdminController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $cityShipping = $form->getData();
-
             $entityManager = $this->getDoctrine()->getManager();
+
+            $cityShipping->setThecoderpsshipping($form->get('thecoderpsshipping')->getData());
+            $cityShipping->setPrice($form->get('price')->getData());
+            $cityShipping->setDeliveryTime($form->get('delivery_time')->getData());
+            $cityShipping->setActive($form->get('active')->getData());
+
             $entityManager->persist($cityShipping);
             $entityManager->flush();
             $this->addFlash(
                 'notice',
-                'city added!'
+                'City information added!'
             );
             // $this->redirectToRoute('thecoder_commune_list', array(), 301);
         }

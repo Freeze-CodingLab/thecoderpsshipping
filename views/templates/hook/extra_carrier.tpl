@@ -7,7 +7,29 @@
 *}
 <div class="alert alert-info" id="depots-list">
     {* {var_dump($cities)} *}
-    {foreach from=$cities item=city}
-        <li>{$city->getCityName()|escape:'htmlall':'UTF-8'}</li>
-    {/foreach}
+    <table id="carrier_depot_list" class="table table-striped table-bordered table-labeled hidden-sm-down">
+        <th>{l s="City Name" mod="thecoderpsshipping"}</th>
+        <th>{l s="Delivery Time" mod="thecoderpsshipping"}</th>
+        <th>{l s="Price" mod="thecoderpsshipping"}</th>
+        <th>{l s="Select" mod="thecoderpsshipping"}</th>
+        {foreach from=$cities item=city}
+            <tr>
+                <td>
+                    {$city['cityName']|escape:'htmlall':'UTF-8'}
+                </td>
+                <td>
+                    {$city[0]->getDeliveryTime()|escape:'htmlall':'UTF-8'}
+                </td>
+                <td>
+                    {$city[0]->getPrice()|escape:'htmlall':'UTF-8'}
+                </td>
+                <td>
+                    {* {$city[0]->getPrice()|escape:'htmlall':'UTF-8'} *}
+                    <input type="radio" name="thecoderpsshipping"
+                        value="{$city[0]->getThecoderpsshipping()->getId()|escape:'htmlall':'UTF-8'}" {if condition}
+                        {/if} />
+                </td>
+            </tr>
+        {/foreach}
+    </table>
 </div>

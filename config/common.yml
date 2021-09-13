@@ -4,3 +4,8 @@ services:
     factory: ['@doctrine.orm.default_entity_manager', getRepository]
     arguments:
       - Thecoderpsshipping\Entity\Thecoderpsshipping
+  thecoder.thecoderpsshipping.repository.thecoderpsshipping_city_shipping_repository:
+    class: Thecoderpsshipping\Repository\ThecoderpsshippingCityShippingRepository
+    factory: ['@doctrine.orm.default_entity_manager', getRepository]
+    arguments:
+      - Thecoderpsshipping\Entity\ThecoderpsshippingCityShipping

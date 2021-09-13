@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace Thecoderpsshipping\Repository;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 /**
  * Class ThecoderpsshippingRepository
  * @package Thecoderpsshipping\Repository
  */
-class ThecoderpsshippingRepository extends EntityManager
+class ThecoderpsshippingRepository extends EntityRepository
 {
-    public function getCityInformation()
+    public function getCitiesInformation()
     {
 
         $tc = $this->createQueryBuilder('t')
