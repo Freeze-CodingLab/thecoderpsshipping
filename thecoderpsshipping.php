@@ -25,7 +25,7 @@ class Thecoderpsshipping extends CarrierModule
         $this->name = 'thecoderpsshipping';
         $this->tab = 'shipping';
         $this->version = '1.0.0';
-        $this->author = 'Yenux TheCoder';
+        $this->author = 'Sopho TheCoder';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = [
             'min' => '1.7',
@@ -44,10 +44,6 @@ class Thecoderpsshipping extends CarrierModule
 
     public function install()
     {
-
-
-        Configuration::updateValue('THECODER1_ZONE_ID', $this->_installZone('Abidjan livraison'));
-        Configuration::updateValue('THECODER2_ZONE_ID', $this->_installZone('Interrieur livraison'));
 
         $carrierConfig = array(
             'name' => $this->l('TheCoder Carrier'),
@@ -69,6 +65,7 @@ class Thecoderpsshipping extends CarrierModule
             && $this->registerHook('actionFrontControllerSetMedia')
             && $this->registerHook('displayHeader')
             && $this->registerHook('footer')
+            && $this->registerHook('displayBeforeBodyClosingTag')
             && $this->registerHook('displayCarrierExtraContent')
             && $this->registerHook('displayOrderConfirmation')
             && $this->registerHook('actionGetIDZoneByAddressID')
@@ -93,13 +90,9 @@ class Thecoderpsshipping extends CarrierModule
         $carrier = new Carrier(
             (int)Configuration::get('THECODER_ID')
         );
-        $zone1 = new Zone(Configuration::get('THECODER1_ZONE_ID'));
-        $zone2 = new Zone(Configuration::get('THECODER2_ZONE_ID'));
 
         Configuration::deleteByName('THECODER_ID');
         $carrier->delete();
-        $zone1->delete();
-        $zone2->delete();
 
         return parent::uninstall() && $this->uninstallSql();
     }
@@ -150,12 +143,10 @@ class Thecoderpsshipping extends CarrierModule
             ';
 
 
-
-        $sqlCart = '
-        CREATE TABLE IF NOT EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_cart`(
+        $sqlShippingAndCartId  = '
+        CREATE TABLE IF NOT EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_shipping_cart_ids`(
             `id_cart` INT(11) NOT NULL,
-            `thecoderpsshipping_city_shipping` INT(11) NOT NULL,
-            `price` decimal(20,6) NOT NULL DEFAULT "0.000000",
+            `id_thecoderpsshipping` INT(11) NOT NULL,
             PRIMARY KEY(
                 `id_cart`
             )
@@ -166,7 +157,7 @@ class Thecoderpsshipping extends CarrierModule
             && Db::getInstance()->execute($sqlCommune)
             && Db::getInstance()->execute($sqlCA)
             && Db::getInstance()->execute($sqlCityShipping)
-            && Db::getInstance()->execute($sqlCart));
+            && Db::getInstance()->execute($sqlShippingAndCartId));
     }
 
 
@@ -177,13 +168,13 @@ class Thecoderpsshipping extends CarrierModule
         $sqlCommune = 'DROP TABLE IF EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_commune`';
         $sqlCA = 'DROP TABLE IF EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_customer_address`';
         $sqlCityShipping = 'DROP TABLE IF EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_city_shipping`';
-        $sqlCart = 'DROP TABLE IF EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_cart`';
+        $sqlShippingAndCartId = 'DROP TABLE IF EXISTS `' . pSQL(_DB_PREFIX_) . 'thecoderpsshipping_shipping_cart_ids`';
 
         return (Db::getInstance()->execute($sqlCity)
             && Db::getInstance()->execute($sqlCommune)
             && Db::getInstance()->execute($sqlCA)
             && Db::getInstance()->execute($sqlCityShipping)
-            && Db::getInstance()->execute($sqlCart));
+            && Db::getInstance()->execute($sqlShippingAndCartId));
     }
 
 
@@ -245,21 +236,6 @@ class Thecoderpsshipping extends CarrierModule
     }
 
 
-    /**
-     * Création de la zone clic and collect
-     * @return bool
-     */
-    protected function _installZone($zone_name)
-    {
-        try {
-            $zone = new Zone();
-            $zone->name = $this->l($zone_name);
-            $zone->save();
-            return $zone->id;
-        } catch (PrestaShopException $e) {
-            return false;
-        }
-    }
 
     public function hookUpdateCarrier($params)
     {
@@ -279,10 +255,16 @@ class Thecoderpsshipping extends CarrierModule
         $repository = $this->get('thecoder.thecoderpsshipping.repository.thecoderpsshipping_city_shipping_repository');
         // die(dump($repository->getShippingPrice()));
 
+        // die(dump(Context::getContext()->cart));
 
         // die(dump(get_class($repository)));
         // if ($params['carrier']['id'] == Configuration::get('THECODER_ID')) {
-        $this->smarty->assign(['cities' => $repository->getShippingPrice()]);
+        $this->smarty->assign(
+            [
+                'cities' => $repository->getShippingPrice(),
+                'cart_id' => Context::getContext()->cart->id
+            ]
+        );
         return $this->display(__FILE__, 'extra_carrier.tpl');
         // }
     }
@@ -407,11 +389,54 @@ class Thecoderpsshipping extends CarrierModule
                 'thecoderpsshipping-javascript',
                 $this->_path . '/views/js/order.js',
                 [
-                    'position' => 'top',
+                    'position' => 'bottom',
+                    'priority' => 1000
+                ]
+            );
+
+            $this->context->controller->registerJavascript(
+                'thecoderpsshipping-javascript',
+                $this->_path . '/views/js/footer.js',
+                [
+                    'position' => 'bottom',
                     'priority' => 1000
                 ]
             );
         }
-        // $this->context->controller->registerCSS($this->_path . '/views/js/order.js');
+    }
+
+    public function footer()
+    {
+        return $this->hookDisplayBeforeBodyClosingTag();
+    }
+
+    public function hookDisplayBeforeBodyClosingTag()
+    {
+        //get city id from database tcps customer address table
+        $sql = new DbQuery();
+        $sql->select('id_thecoderpsshipping');
+        $sql->from('thecoderpsshipping_customer_address', 'tca');
+
+        $resultSql = Db::getInstance()->executeS($sql);
+
+        $link = new Link();
+        $ajax_url = $link->getModuleLink(
+            $this->name,
+            'ajaxThecoderpsshippingCost'
+        );
+        $cart = Context::getContext()->cart;
+        $id_address_delivery = $cart->id_address_delivery;
+        // $address = new Address($id_address_delivery);
+        $city_id = $resultSql[0]['id_thecoderpsshipping'];
+
+        $this->smarty->assign(
+            [
+                'ajax_url' => $ajax_url,
+                'thecoderpsshipping_id' => $city_id,
+                'thecoder_carrier_id' => Configuration::get('THECODER_ID'),
+            ]
+        );
+
+        return $this->display(__FILE__, 'footer.tpl', $this->getCacheId());
     }
 }
